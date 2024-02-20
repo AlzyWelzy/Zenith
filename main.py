@@ -15,6 +15,7 @@ load_dotenv()
 
 BOT_TOKEN: Final = os.getenv("BOT_TOKEN")
 BOT_USERNAME: Final = os.getenv("BOT_USERNAME")
+KILL_SWITCH = False
 
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -42,9 +43,10 @@ async def custom_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def handle_responses(text: str) -> str:
     processed: str = text.lower()
 
-    if processed == "hello":
+    if "hello" in processed:
         return "Hey there!"
-    elif processed == "bye":
+
+    if "bye" in processed:
         return "Bye!"
 
     if "i love you" in processed:
@@ -59,13 +61,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     print(f"User ({update.message.chat.id}) in {message_type}: '{text}'")
 
-    if message_type == "group":
-        if BOT_USERNAME in text:
-            new_text: str = text.replace(BOT_USERNAME, "").strip()
-            response: str = handle_responses(new_text)
+    if KILL_SWITCH:
+        if message_type == "group":
+            if BOT_USERNAME in text:
+                new_text: str = text.replace(BOT_USERNAME, "").strip()
+                response: str = handle_responses(new_text)
+            else:
+                return
         else:
-            return
+            response: str = handle_responses(text)
     else:
+
         response: str = handle_responses(text)
 
     print("Bot:", response)
