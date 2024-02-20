@@ -1,2 +1,2 @@
-# Zenith
-Zenith, your dynamic Telegram companion, streamlines communication with efficiency and flair. Empowered by cutting-edge technology, Zenith delivers seamless interactions, responding promptly to commands, making your experience elevated and enjoyable. Elevate your Telegram experience with Zenith today!
+# Zenithia
+Zenithia, your agile Telegram companion, combines seamless communication with sophistication. Powered by advanced tech, Zenithia ensures swift interactions, responding adeptly to commands, and enhancing your Telegram experience with a touch of finesse. Elevate your conversations with Zenithia today!
