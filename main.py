@@ -1,19 +1,7 @@
-"""
-Simple Bot to reply to Telegram messages.
-
-First, a few handler functions are defined. Then, those functions are passed to
-the Application and registered at their respective places.
-Then, the bot is started and runs until we press Ctrl-C on the command line.
-
-Usage:
-Basic Echobot example, repeats messages.
-Press Ctrl-C on the command line or send a signal to the process to stop the
-bot.
-"""
-
-import logging
-
-from telegram import ForceReply, Update
+import os
+from dotenv import load_dotenv
+from typing import Final
+from telegram import Update
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -21,54 +9,90 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-import os
-from dotenv import load_dotenv
+
 
 load_dotenv()
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+BOT_TOKEN: Final = os.getenv("BOT_TOKEN")
+BOT_USERNAME: Final = os.getenv("BOT_USERNAME")
 
 
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
-)
-
-logging.getLogger("httpx").setLevel(logging.WARNING)
-
-logger = logging.getLogger(__name__)
-
-
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Send a message when the command /start is issued."""
-    user = update.effective_user
-    await update.message.reply_html(
-        rf"Hi {user.mention_html()}!",
-        reply_markup=ForceReply(selective=True),
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    START_TEXT = "🌟 Welcome to ZenithiaBot! Your intelligent companion on Telegram. I'm here to enhance your messaging experience with seamless interactions and a touch of sophistication. Feel free to explore and make your conversations smarter! 🚀✨"
+    await update.message.reply_text(
+        f"Hello, {update.effective_user.first_name}! {START_TEXT}"
     )
 
 
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Send a message when the command /help is issued."""
-    await update.message.reply_text("Help!")
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    HELP_TEXT = "I'm ZenithiaBot. I can help you with your queries. Send me any message and I'll try to get back to you."
+    await update.message.reply_text(
+        f"Hello, {update.effective_user.first_name}! {HELP_TEXT}"
+    )
 
 
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Echo the user message."""
-    await update.message.reply_text(update.message.text)
+async def custom_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    CUSTOM_TEXT = "This is a custom command!"
+    await update.message.reply_text(f"{CUSTOM_TEXT}")
 
 
-def main() -> None:
-    """Start the bot."""
+# Responses
 
-    application = Application.builder().token(BOT_TOKEN).build()
 
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("help", help_command))
+def handle_responses(text: str) -> str:
+    processed: str = text.lower()
 
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+    if processed == "hello":
+        return "Hey there!"
+    elif processed == "bye":
+        return "Bye!"
 
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    if "i love you" in processed:
+        return "I love you too!"
+
+    return "I don't understand. Please try again!"
+
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    message_type: str = update.message.chat.type
+    text: str = update.message.text
+
+    print(f"User ({update.message.chat.id}) in {message_type}: '{text}'")
+
+    if message_type == "group":
+        if BOT_USERNAME in text:
+            new_text: str = text.replace(BOT_USERNAME, "").strip()
+            response: str = handle_responses(new_text)
+        else:
+            return
+    else:
+        response: str = handle_responses(text)
+
+    print("Bot:", response)
+    await update.message.reply_text(response)
+
+
+async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print(f"Update {update} caused error {context.error}")
 
 
 if __name__ == "__main__":
-    main()
+    print("Starting Telegram bot...")
+    application = Application.builder().token(BOT_TOKEN).build()
+
+    # Commands
+    application.add_handler(CommandHandler("start", start_command))
+    application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("custom", custom_command))
+
+    # Messages
+    application.add_handler(
+        MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message)
+    )
+
+    # Errors
+    application.add_error_handler(error)
+
+    # Polls the bot
+    print("Starting polling...")
+    application.run_polling(poll_interval=3)
