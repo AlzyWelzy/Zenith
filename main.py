@@ -19,7 +19,7 @@ KILL_SWITCH = False
 
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    START_TEXT = "🌟 Welcome to ZenithiaBot! Your intelligent companion on Telegram. I'm here to enhance your messaging experience with seamless interactions and a touch of sophistication. Feel free to explore and make your conversations smarter! 🚀✨"
+    START_TEXT = f"🌟 Welcome to {BOT_USERNAME}! Your intelligent companion on Telegram. I'm here to enhance your messaging experience with seamless interactions and a touch of sophistication. Feel free to explore and make your conversations smarter! 🚀✨"
     await update.message.reply_text(
         f"Hello, {update.effective_user.first_name}! {START_TEXT}"
     )
@@ -82,7 +82,7 @@ async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print(f"Update {update} caused error {context.error}")
 
 
-if __name__ == "__main__":
+def main():
     print("Starting Telegram bot...")
     application = Application.builder().token(BOT_TOKEN).build()
 
@@ -102,3 +102,7 @@ if __name__ == "__main__":
     # Polls the bot
     print("Starting polling...")
     application.run_polling(poll_interval=3)
+
+
+if __name__ == "__main__":
+    main()
