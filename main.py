@@ -65,7 +65,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     print(f"User ({update.message.chat_id}) in {message_type}: '{text}'")
 
-    if message_type in ["group", "supergroup"]:
+    if message_type in {"group", "supergroup"}:
         print(f"Text: {text}, Bot username: {BOT_USERNAME}")
         if BOT_USERNAME in text:
             print("Bot found in text")
