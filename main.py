@@ -103,7 +103,7 @@ def main() -> None:
 
     # Polls the bot
     print("Starting polling...")
-    application.run_polling(poll_interval=1)
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":
