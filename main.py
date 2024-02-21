@@ -13,28 +13,26 @@ from telegram.ext import (
 
 load_dotenv()
 
-# BOT_TOKEN: Final = os.getenv("BOT_TOKEN")
-# BOT_USERNAME: Final = os.getenv("BOT_USERNAME")
+BOT_TOKEN: Final = os.getenv("BOT_TOKEN")
+BOT_USERNAME: Final = os.getenv("BOT_USERNAME")
 
-BOT_TOKEN: Final = "7109562910:AAFU3lu94wH4i_ol43zJe6xzO1zqsG4LZfw"
-BOT_USERNAME: Final = "@Memokeeper_bot"
 
 # Commands
 
 
-async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         "Hello There, I'm ZenithiaBot. I can help you with your queries. Send me any message and I'll try to get back to you."
     )
 
 
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         "I'm ZenithiaBot. I can help you with your queries. Send me any message and I'll try to get back to you."
     )
 
 
-async def custom_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def custom_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("This is a custom command!")
 
 
@@ -59,7 +57,7 @@ def handle_response(text: str) -> str:
     return "I don't understand. Please try again!"
 
 
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     message_type: str = update.message.chat.type
     text: str = update.message.text
 
@@ -82,11 +80,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(response)
 
 
-async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def error(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     print(f"Update {update} caused error {context.error}")
 
 
-def main():
+def main() -> None:
     print("Starting bot...")
     application = Application.builder().token(BOT_TOKEN).build()
 
