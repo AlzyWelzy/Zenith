@@ -13,9 +13,11 @@ from telegram.ext import (
 
 load_dotenv()
 
-BOT_TOKEN: Final = os.getenv("BOT_TOKEN")
-BOT_USERNAME: Final = os.getenv("BOT_USERNAME")
+# BOT_TOKEN: Final = os.getenv("BOT_TOKEN")
+# BOT_USERNAME: Final = os.getenv("BOT_USERNAME")
 
+BOT_TOKEN: Final = "7109562910:AAFU3lu94wH4i_ol43zJe6xzO1zqsG4LZfw"
+BOT_USERNAME: Final = "@Memokeeper_bot"
 
 # Commands
 
@@ -63,14 +65,48 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     print(f"User ({update.message.chat_id}) in {message_type}: '{text}'")
 
-    if message_type == "group":
+    if message_type in ["group", "supergroup"]:
+        print(f"Text: {text}, Bot username: {BOT_USERNAME}")
         if BOT_USERNAME in text:
+            print("Bot found in text")
             new_text: str = text.replace(BOT_USERNAME, "").strip()
             response: str = handle_response(new_text)
         else:
+            print("Bot not found in text")
             return
     else:
+        print("Bot not in group")
         response: str = handle_response(text)
 
     print("Bot:", response)
     await update.message.reply_text(response)
+
+
+async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print(f"Update {update} caused error {context.error}")
+
+
+def main():
+    print("Starting bot...")
+    application = Application.builder().token(BOT_TOKEN).build()
+
+    # Commands
+    application.add_handler(CommandHandler("start", start_command))
+    application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("custom", custom_command))
+
+    # Messages
+    application.add_handler(
+        MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message)
+    )
+
+    # Errors
+    application.add_error_handler(error)
+
+    # Polls the bot
+    print("Starting polling...")
+    application.run_polling(poll_interval=1)
+
+
+if __name__ == "__main__":
+    main()
